@@ -2,9 +2,9 @@
 export const dynamic = 'force-dynamic'
 
 import { useSearchParams, usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 
-export default function ViewPage() {
+function InnerView() {
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const [html, setHtml] = useState('')
@@ -22,7 +22,7 @@ export default function ViewPage() {
       })
       .then(setHtml)
       .catch((err) => setError(err.message))
-  }, [searchParams, pathname]) // 👈 クエリもパスも監視！
+  }, [searchParams, pathname])
 
   const url = searchParams.get('url')
 
@@ -39,5 +39,13 @@ export default function ViewPage() {
       dangerouslySetInnerHTML={{ __html: html }}
       style={{ width: '100%', minHeight: '100vh' }}
     />
+  )
+}
+
+export default function ViewPage() {
+  return (
+    <Suspense fallback={<p>読み込み中...</p>}>
+      <InnerView />
+    </Suspense>
   )
 }
